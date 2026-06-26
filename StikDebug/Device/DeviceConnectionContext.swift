@@ -1,22 +1,26 @@
 //
 //  DeviceConnectionContext.swift
-//  StikDebug
-//
-//  Created by Stephen.
+//  StikJIT
 //
 
 import Foundation
+import UIKit
 
 enum DeviceConnectionContext {
-    static let defaultTargetIPAddress = "10.7.0.1"
-
     static var targetIPAddress: String {
-        let stored = UserDefaults.standard
-            .string(forKey: UserDefaults.Keys.targetDeviceIP)?
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        guard let stored, !stored.isEmpty else {
-            return defaultTargetIPAddress
+        let stored = UserDefaults.standard.string(forKey: "customTargetIP")
+        if let stored, !stored.isEmpty {
+            return stored
         }
-        return stored
+        return "10.7.0.1"  // Loopback VPN
+    }
+    
+    static var isModernRSD: Bool {
+        let version = UIDevice.current.systemVersion
+        return version.compare("17.4", options: .numeric) != .orderedAscending
+    }
+    
+    static var connectionMode: String {
+        isModernRSD ? "RSD (iOS 17.4+)" : "Legacy Lockdown (iOS 16)"
     }
 }
